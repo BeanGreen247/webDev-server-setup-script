@@ -7,73 +7,73 @@ pass="dev"
 stringLogDir='${APACHE_LOG_DIR}'
 
 function quit {
-        echo -e "Script created by \e[1;32mBeanGreen247\e[1;0m \e[1;31mhttps://github.com/BeanGreen247 \e[1;0m\n"
-        exit 1
+    echo -e "Script created by \e[1;32mBeanGreen247\e[1;0m \e[1;31mhttps://github.com/BeanGreen247 \e[1;0m\n"
+    exit 1
 }
 
 function main {
-        echo $pass | sudo -S rm -rf phpMyAdmin-* phpmyadmin.keyring /var/www/html/phpMyAdmin
-        wget https://files.phpmyadmin.net/phpMyAdmin/5.2.1/phpMyAdmin-5.2.1-all-languages.zip.asc
-        gpg --verify phpMyAdmin-5.2.1-all-languages.zip.asc
-        gpg --update-trustdb
-        wget https://files.phpmyadmin.net/phpMyAdmin/5.2.1/phpMyAdmin-5.2.1-all-languages.tar.gz
-        wget https://files.phpmyadmin.net/phpmyadmin.keyring
-        gpg --import phpmyadmin.keyring
-        gpg --update-trustdb
-        echo $pass | sudo -S mkdir /var/www/html/phpMyAdmin
-        echo $pass | sudo -S tar xvf phpMyAdmin-5.2.1-all-languages.tar.gz --strip-components=1 -C /var/www/html/phpMyAdmin
-        echo $pass | sudo -S cp /var/www/html/phpMyAdmin/config.sample.inc.php /var/www/html/phpMyAdmin/config.inc.php
-        echo "Open /var/www/html/phpMyAdmin/config.inc.php using nano as root and fill in the line here $cfg['blowfish_secret'] = ''; with $cfg['blowfish_secret'] = 'dev';"
-        echo "then save and exit..."
-        echo "Once done press any key..."
-        read -rsn1 inputTemp
-        echo $pass | sudo -S chown -Rfv www-data:www-data /opt/phpMyAdmin #may not be needed
+    echo $pass | sudo -S rm -rf phpMyAdmin-* phpmyadmin.keyring /var/www/html/phpMyAdmin
+    wget https://files.phpmyadmin.net/phpMyAdmin/5.2.1/phpMyAdmin-5.2.1-all-languages.zip.asc
+    gpg --verify phpMyAdmin-5.2.1-all-languages.zip.asc
+    gpg --update-trustdb
+    wget https://files.phpmyadmin.net/phpMyAdmin/5.2.1/phpMyAdmin-5.2.1-all-languages.tar.gz
+    wget https://files.phpmyadmin.net/phpmyadmin.keyring
+    gpg --import phpmyadmin.keyring
+    gpg --update-trustdb
+    echo $pass | sudo -S mkdir /var/www/html/phpMyAdmin
+    echo $pass | sudo -S tar xvf phpMyAdmin-5.2.1-all-languages.tar.gz --strip-components=1 -C /var/www/html/phpMyAdmin
+    echo $pass | sudo -S cp /var/www/html/phpMyAdmin/config.sample.inc.php /var/www/html/phpMyAdmin/config.inc.php
+    echo "Open /var/www/html/phpMyAdmin/config.inc.php using nano as root and fill in the line here $cfg['blowfish_secret'] = ''; with $cfg['blowfish_secret'] = 'dev';"
+    echo "then save and exit..."
+    echo "Once done press any key..."
+    read -rsn1 inputTemp
+    echo $pass | sudo -S chown -Rfv www-data:www-data /opt/phpMyAdmin #may not be needed
 
-        echo $pass | sudo -S echo -e "<?php\nphpinfo();" > temp.txt
-        echo $pass | sudo -S mv temp.txt /var/www/html/info.php
+    echo $pass | sudo -S echo -e "<?php\nphpinfo();" >temp.txt
+    echo $pass | sudo -S mv temp.txt /var/www/html/info.php
 
-        echo $pass | sudo -S systemctl enable apache2 vsftpd
-        echo $pass | sudo -S systemctl restart apache2
+    echo $pass | sudo -S systemctl enable apache2 vsftpd
+    echo $pass | sudo -S systemctl restart apache2
 
-        echo $pass | sudo -S echo "<VirtualHost *:9000>" > temp.txt
-        echo $pass | sudo -S echo "ServerAdmin dev@localhost" >> temp.txt
-        echo $pass | sudo -S echo -e "DocumentRoot /var/www/html/phpMyAdmin\n" >> temp.txt
-        echo $pass | sudo -S echo "<Directory /var/www/html/phpMyAdmin>" >> temp.txt
-        echo $pass | sudo -S echo "Options Indexes FollowSymLinks" >> temp.txt
-        echo $pass | sudo -S echo "AllowOverride none" >> temp.txt
-        echo $pass | sudo -S echo "Require all granted" >> temp.txt
-        echo $pass | sudo -S echo "</Directory>" >> temp.txt
-        echo $pass | sudo -S echo "ErrorLog "$stringLogDir"/error_phpmyadmin.log" >> temp.txt
-        echo $pass | sudo -S echo "CustomLog "$stringLogDir"/access_phpmyadmin.log combined" >> temp.txt
-        echo $pass | sudo -S echo "</VirtualHost>" >> temp.txt
+    echo $pass | sudo -S echo "<VirtualHost *:9000>" >temp.txt
+    echo $pass | sudo -S echo "ServerAdmin dev@localhost" >>temp.txt
+    echo $pass | sudo -S echo -e "DocumentRoot /var/www/html/phpMyAdmin\n" >>temp.txt
+    echo $pass | sudo -S echo "<Directory /var/www/html/phpMyAdmin>" >>temp.txt
+    echo $pass | sudo -S echo "Options Indexes FollowSymLinks" >>temp.txt
+    echo $pass | sudo -S echo "AllowOverride none" >>temp.txt
+    echo $pass | sudo -S echo "Require all granted" >>temp.txt
+    echo $pass | sudo -S echo "</Directory>" >>temp.txt
+    echo $pass | sudo -S echo "ErrorLog "$stringLogDir"/error_phpmyadmin.log" >>temp.txt
+    echo $pass | sudo -S echo "CustomLog "$stringLogDir"/access_phpmyadmin.log combined" >>temp.txt
+    echo $pass | sudo -S echo "</VirtualHost>" >>temp.txt
 
-        echo $pass | sudo -S mv temp.txt /etc/apache2/sites-available/phpmyadmin.conf
+    echo $pass | sudo -S mv temp.txt /etc/apache2/sites-available/phpmyadmin.conf
 
-        echo $pass | sudo -S sudo systemctl restart apache2
+    echo $pass | sudo -S sudo systemctl restart apache2
 
-        echo $pass | sudo -S cp -r  /etc/vsftpd.conf /etc/vsftpd.conf.bak
-        echo $pass | sudo -S echo "local_enable=YES" > temp.txt
-        echo $pass | sudo -S echo "listen=YES" >> temp.txt
-        echo $pass | sudo -S echo "#listen_ipv6=NO" >> temp.txt
-        echo $pass | sudo -S echo "write_enable=YES" >> temp.txt
-        echo $pass | sudo -S echo "listen_port=21" >> temp.txt
-        echo $pass | sudo -S echo "chroot_local_user=YES" >> temp.txt
-        echo $pass | sudo -S echo "chroot_list_enable=YES" >> temp.txt
-        echo $pass | sudo -S echo "chroot_list_file=/etc/vsftpd.chroot_list" >> temp.txt
-        echo $pass | sudo -S echo "secure_chroot_dir=/var/run/vsftpd/empty" >> temp.txt
-        echo $pass | sudo -S echo "pam_service_name=vsftpd" >> temp.txt
-        echo $pass | sudo -S echo "rsa_cert_file=/etc/ssl/private/vsftpd.pem" >> temp.txt
+    echo $pass | sudo -S cp -r /etc/vsftpd.conf /etc/vsftpd.conf.bak
+    echo $pass | sudo -S echo "local_enable=YES" >temp.txt
+    echo $pass | sudo -S echo "listen=YES" >>temp.txt
+    echo $pass | sudo -S echo "#listen_ipv6=NO" >>temp.txt
+    echo $pass | sudo -S echo "write_enable=YES" >>temp.txt
+    echo $pass | sudo -S echo "listen_port=21" >>temp.txt
+    echo $pass | sudo -S echo "chroot_local_user=YES" >>temp.txt
+    echo $pass | sudo -S echo "chroot_list_enable=YES" >>temp.txt
+    echo $pass | sudo -S echo "chroot_list_file=/etc/vsftpd.chroot_list" >>temp.txt
+    echo $pass | sudo -S echo "secure_chroot_dir=/var/run/vsftpd/empty" >>temp.txt
+    echo $pass | sudo -S echo "pam_service_name=vsftpd" >>temp.txt
+    echo $pass | sudo -S echo "rsa_cert_file=/etc/ssl/private/vsftpd.pem" >>temp.txt
 
-        echo $pass | sudo -S echo "dev" > temp1.txt
+    echo $pass | sudo -S echo "dev" >temp1.txt
 
-        echo $pass | sudo -S mv temp.txt /etc/vsftpd.conf
-        echo $pass | sudo -S mv temp1.txt /etc/vsftpd.chroot_list
+    echo $pass | sudo -S mv temp.txt /etc/vsftpd.conf
+    echo $pass | sudo -S mv temp1.txt /etc/vsftpd.chroot_list
 
-        echo $pass | sudo -S systemctl restart vsftpd
+    echo $pass | sudo -S systemctl restart vsftpd
 
-        echo $pass | sudo -S ufw allow ftp
-        echo $pass | sudo -S ufw allow 21
-        quit
+    echo $pass | sudo -S ufw allow ftp
+    echo $pass | sudo -S ufw allow 21
+    quit
 }
 
 echo $pass | sudo -S apt update
