@@ -11,24 +11,23 @@ function quit {
         exit 1
 }
 
-
 function main {
-	echo $pass | sudo -S rm -rf phpMyAdmin-5.2.1-* phpmyadmin.keyring /var/www/html/phpMyAdmin
-	wget https://files.phpmyadmin.net/phpMyAdmin/5.2.1/phpMyAdmin-5.2.1-all-languages.zip.asc
-	gpg --verify phpMyAdmin-5.2.1-all-languages.zip.asc
-	gpg --update-trustdb
+        echo $pass | sudo -S rm -rf phpMyAdmin-* phpmyadmin.keyring /var/www/html/phpMyAdmin
+        wget https://files.phpmyadmin.net/phpMyAdmin/5.2.1/phpMyAdmin-5.2.1-all-languages.zip.asc
+        gpg --verify phpMyAdmin-5.2.1-all-languages.zip.asc
+        gpg --update-trustdb
         wget https://files.phpmyadmin.net/phpMyAdmin/5.2.1/phpMyAdmin-5.2.1-all-languages.tar.gz
-	wget https://files.phpmyadmin.net/phpmyadmin.keyring
-	gpg --import phpmyadmin.keyring
-	gpg --update-trustdb
-	echo $pass | sudo -S mkdir /var/www/html/phpMyAdmin
+        wget https://files.phpmyadmin.net/phpmyadmin.keyring
+        gpg --import phpmyadmin.keyring
+        gpg --update-trustdb
+        echo $pass | sudo -S mkdir /var/www/html/phpMyAdmin
         echo $pass | sudo -S tar xvf phpMyAdmin-5.2.1-all-languages.tar.gz --strip-components=1 -C /var/www/html/phpMyAdmin
-	echo $pass | sudo -S cp /var/www/html/phpMyAdmin/config.sample.inc.php /var/www/html/phpMyAdmin/config.inc.php
-	echo "Open /var/www/html/phpMyAdmin/config.inc.php using nano as root and fill in the line here $cfg['blowfish_secret'] = ''; with $cfg['blowfish_secret'] = 'dev';"
-	echo "then save and exit..."
-	echo "Once done press any key..."
-	read -rsn1 inputTemp
-	echo $pass | sudo -S chown -Rfv www-data:www-data /opt/phpMyAdmin #may not be needed
+        echo $pass | sudo -S cp /var/www/html/phpMyAdmin/config.sample.inc.php /var/www/html/phpMyAdmin/config.inc.php
+        echo "Open /var/www/html/phpMyAdmin/config.inc.php using nano as root and fill in the line here $cfg['blowfish_secret'] = ''; with $cfg['blowfish_secret'] = 'dev';"
+        echo "then save and exit..."
+        echo "Once done press any key..."
+        read -rsn1 inputTemp
+        echo $pass | sudo -S chown -Rfv www-data:www-data /opt/phpMyAdmin #may not be needed
 
         echo $pass | sudo -S echo -e "<?php\nphpinfo();" > temp.txt
         echo $pass | sudo -S mv temp.txt /var/www/html/info.php
@@ -52,34 +51,38 @@ function main {
 
         echo $pass | sudo -S sudo systemctl restart apache2
 
-	# WIP FTP server
-        #echo $pass | sudo -S cp -r  /etc/vsftpd.conf /etc/vsftpd.conf.bak
-        #echo $pass | sudo -S echo "local_enable=YES" > temp.txt
-        #echo $pass | sudo -S echo "listen=YES" >> temp.txt
-        #echo $pass | sudo -S echo "#listen_ipv6=NO" >> temp.txt
-        #echo $pass | sudo -S echo "write_enable=YES" >> temp.txt
-        #echo $pass | sudo -S echo "listen_port=21" >> temp.txt
-        #echo $pass | sudo -S echo "chroot_local_user=YES" >> temp.txt
-        #echo $pass | sudo -S echo "chroot_list_enable=YES" >> temp.txt
-        #echo $pass | sudo -S echo "chroot_list_file=/etc/vsftpd.chroot_list" >> temp.txt
-        #echo $pass | sudo -S echo "secure_chroot_dir=/var/run/vsftpd/empty" >> temp.txt
-        #echo $pass | sudo -S echo "pam_service_name=vsftpd" >> temp.txt
-        #echo $pass | sudo -S echo "rsa_cert_file=/etc/ssl/private/vsftpd.pem" >> temp.txt
+        echo $pass | sudo -S cp -r  /etc/vsftpd.conf /etc/vsftpd.conf.bak
+        echo $pass | sudo -S echo "local_enable=YES" > temp.txt
+        echo $pass | sudo -S echo "listen=YES" >> temp.txt
+        echo $pass | sudo -S echo "#listen_ipv6=NO" >> temp.txt
+        echo $pass | sudo -S echo "write_enable=YES" >> temp.txt
+        echo $pass | sudo -S echo "listen_port=21" >> temp.txt
+        echo $pass | sudo -S echo "chroot_local_user=YES" >> temp.txt
+        echo $pass | sudo -S echo "chroot_list_enable=YES" >> temp.txt
+        echo $pass | sudo -S echo "chroot_list_file=/etc/vsftpd.chroot_list" >> temp.txt
+        echo $pass | sudo -S echo "secure_chroot_dir=/var/run/vsftpd/empty" >> temp.txt
+        echo $pass | sudo -S echo "pam_service_name=vsftpd" >> temp.txt
+        echo $pass | sudo -S echo "rsa_cert_file=/etc/ssl/private/vsftpd.pem" >> temp.txt
 
-        #echo $pass | sudo -S echo "dev" > temp1.txt
+        echo $pass | sudo -S echo "dev" > temp1.txt
 
-        #echo $pass | sudo -S mv temp.txt /etc/vsftpd.conf
-        #echo $pass | sudo -S mv temp1.txt /etc/vsftpd.chroot_list
+        echo $pass | sudo -S mv temp.txt /etc/vsftpd.conf
+        echo $pass | sudo -S mv temp1.txt /etc/vsftpd.chroot_list
 
-        #echo $pass | sudo -S systemctl restart vsftpd
+        echo $pass | sudo -S systemctl restart vsftpd
 
         echo $pass | sudo -S ufw allow ftp
         echo $pass | sudo -S ufw allow 21
-	quit
+        quit
 }
 
 echo $pass | sudo -S apt update
-echo $pass | sudo -S apt install -y wget curl unzip ufw apache2 mariadb-server mariadb-client php7.4 libapache2-mod-php7.4 php7.4-mysql php-pear vsftpd build-essential
+echo $pass | sudo -S apt install -y wget curl apache2 mariadb-server mariadb-client php7.4 libapache2-mod-php7.4 php7.4-mysql php-pear vsftpd build-essential python3 python3-dev python3-jinja2 python3-psutil python3-setuptools psensor psensor-server python3-pip lm-sensors
+
+pip3 install --upgrade pip --user
+pip3 install glances --user
+
+echo $pass | sudo -S apt clean
 
 echo "run sudo mysql_secure_installation and set up like this"
 echo "As you have not yet set a root password for your database, hit Enter to skip the initial query. Complete the following queries:"
