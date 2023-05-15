@@ -1,18 +1,21 @@
 # links
-#http://192.168.0.110/
-#http://192.168.0.110/info.php
-#http://192.168.0.110/phpMyAdmin
+#http://192.168.0.110/ apache2_default_index_html
+#http://192.168.0.110/info.php php_information
+#http://192.168.0.110/phpMyAdmin phpMyAdmin
+#http://192.168.2.117:61208/ glances
 
 pass="dev"
+username="dev"
 stringLogDir='${APACHE_LOG_DIR}'
 
 function quit {
     echo -e "Script created by \e[1;32mBeanGreen247\e[1;0m \e[1;31mhttps://github.com/BeanGreen247 \e[1;0m\n"
+    echo "Please reboot..."
     exit 1
 }
 
 function main {
-    echo $pass | sudo -S rm -rf phpMyAdmin-* phpmyadmin.keyring /var/www/html/phpMyAdmin
+    echo $pass | sudo -S rm -rf phpMyAdmin-* phpmyadmin.keyring /var/www/html/phpMyAdmin temp*.txt
     wget https://files.phpmyadmin.net/phpMyAdmin/5.2.1/phpMyAdmin-5.2.1-all-languages.zip.asc
     gpg --verify phpMyAdmin-5.2.1-all-languages.zip.asc
     gpg --update-trustdb
@@ -71,8 +74,25 @@ function main {
 
     echo $pass | sudo -S systemctl restart vsftpd
 
+    echo $pass | sudo -S systemctl enable ufw
     echo $pass | sudo -S ufw allow ftp
     echo $pass | sudo -S ufw allow 21
+    echo $pass | sudo -S ufw allow 61208
+    echo $pass | sudo -S ufw reload
+
+    #glances autostart #WIP
+    #echo $pass | sudo -S echo "[Unit]" > temp2.txt
+    #echo $pass | sudo -S echo "Description=Glances" >> temp2.txt
+    #echo $pass | sudo -S echo "After=network.target" >> temp2.txt
+    #echo $pass | sudo -S echo "[Service]" >> temp2.txt
+    #echo $pass | sudo -S echo "ExecStart=/usr/local/bin/glances -w" >> temp2.txt
+    #echo $pass | sudo -S echo "Restart=on-abort" >> temp2.txt
+    #echo $pass | sudo -S echo "RemainAfterExit=yes" >> temp2.txt
+    #echo $pass | sudo -S echo "[Install]" >> temp2.txt
+    #echo $pass | sudo -S echo "WantedBy=multi-user.target" >> temp2.txt
+    #echo $pass | sudo -S mv temp2.txt /etc/systemd/system/glances.service
+    #echo $pass | sudo -S systemctl enable glances.service
+    echo $pass | sudo -S rm -rf phpMyAdmin-* phpmyadmin.keyring temp*.txt
     quit
 }
 
@@ -80,7 +100,8 @@ echo $pass | sudo -S apt update
 echo $pass | sudo -S apt install -y wget curl apache2 mariadb-server mariadb-client php7.4 libapache2-mod-php7.4 php7.4-mysql php-pear vsftpd build-essential python3 python3-dev python3-jinja2 python3-psutil python3-setuptools psensor psensor-server python3-pip lm-sensors
 
 pip3 install --upgrade pip --user
-pip3 install glances --user
+pip3 install --user bottle
+wget -O- https://bit.ly/glances | /bin/bash
 
 echo $pass | sudo -S apt clean
 
