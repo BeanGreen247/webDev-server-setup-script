@@ -2,7 +2,6 @@
 #http://192.168.0.110/ apache2_default_index_html
 #http://192.168.0.110/info.php php_information
 #http://192.168.0.110/phpMyAdmin phpMyAdmin
-#http://192.168.2.117:61208/ glances
 
 pass="dev"
 username="dev"
