@@ -12,5 +12,12 @@ server {
 		index index.php
         try_files $uri $uri/ /test-nginx/index.php;
     	fastcgi_pass unix:/run/php/php7.4-fpm.sock;
-  	}	
+  	}
+
+	location /test-page-1 {
+        include snippets/fastcgi-php.conf;
+		index index.php
+        try_files $uri $uri/ /test-page-1/index.php;
+    	fastcgi_pass unix:/run/php/php7.4-fpm.sock;
+  	}
 }
