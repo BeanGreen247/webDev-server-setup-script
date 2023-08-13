@@ -2,7 +2,6 @@
 #http://192.168.0.110/ apache2_default_index_html
 #http://192.168.0.110/info.php php_information
 #http://192.168.0.110/phpMyAdmin phpMyAdmin
-#http://192.168.2.117:61208/ glances
 
 pass="dev"
 username="dev"
@@ -19,14 +18,14 @@ function main {
     wget https://files.phpmyadmin.net/phpMyAdmin/5.2.1/phpMyAdmin-5.2.1-all-languages.zip.asc
     gpg --verify phpMyAdmin-5.2.1-all-languages.zip.asc
     gpg --update-trustdb
-    wget https://files.phpmyadmin.net/phpMyAdmin/5.2.1/phpMyAdmin-5.2.1-all-languages.tar.gz
     wget https://files.phpmyadmin.net/phpmyadmin.keyring
     gpg --import phpmyadmin.keyring
     gpg --update-trustdb
+    wget https://files.phpmyadmin.net/phpMyAdmin/5.2.1/phpMyAdmin-5.2.1-all-languages.tar.gz
     echo $pass | sudo -S mkdir /var/www/html/phpMyAdmin
     echo $pass | sudo -S tar xvf phpMyAdmin-5.2.1-all-languages.tar.gz --strip-components=1 -C /var/www/html/phpMyAdmin
     echo $pass | sudo -S cp /var/www/html/phpMyAdmin/config.sample.inc.php /var/www/html/phpMyAdmin/config.inc.php
-    echo "Open /var/www/html/phpMyAdmin/config.inc.php using nano as root and fill in the line here $cfg['blowfish_secret'] = ''; with $cfg['blowfish_secret'] = 'dev';"
+    echo "Open /var/www/html/phpMyAdmin/config.inc.php using nano as root and fill in the line here $cfg['blowfish_secret'] = ''; with $cfg['blowfish_secret'] = '$username';"
     echo "then save and exit..."
     echo "Once done press any key..."
     read -rsn1 inputTemp
@@ -39,7 +38,7 @@ function main {
     echo $pass | sudo -S systemctl restart apache2
 
     echo $pass | sudo -S echo "<VirtualHost *:9000>" >temp.txt
-    echo $pass | sudo -S echo "ServerAdmin dev@localhost" >>temp.txt
+    echo $pass | sudo -S echo "ServerAdmin $username@localhost" >>temp.txt
     echo $pass | sudo -S echo -e "DocumentRoot /var/www/html/phpMyAdmin\n" >>temp.txt
     echo $pass | sudo -S echo "<Directory /var/www/html/phpMyAdmin>" >>temp.txt
     echo $pass | sudo -S echo "Options Indexes FollowSymLinks" >>temp.txt
@@ -67,7 +66,7 @@ function main {
     echo $pass | sudo -S echo "pam_service_name=vsftpd" >>temp.txt
     echo $pass | sudo -S echo "rsa_cert_file=/etc/ssl/private/vsftpd.pem" >>temp.txt
 
-    echo $pass | sudo -S echo "dev" >temp1.txt
+    echo $pass | sudo -S echo "$username" >temp1.txt
 
     echo $pass | sudo -S mv temp.txt /etc/vsftpd.conf
     echo $pass | sudo -S mv temp1.txt /etc/vsftpd.chroot_list
@@ -80,28 +79,46 @@ function main {
     echo $pass | sudo -S ufw allow 61208
     echo $pass | sudo -S ufw reload
 
-    #glances autostart #WIP
-    #echo $pass | sudo -S echo "[Unit]" > temp2.txt
-    #echo $pass | sudo -S echo "Description=Glances" >> temp2.txt
-    #echo $pass | sudo -S echo "After=network.target" >> temp2.txt
-    #echo $pass | sudo -S echo "[Service]" >> temp2.txt
-    #echo $pass | sudo -S echo "ExecStart=/usr/local/bin/glances -w" >> temp2.txt
-    #echo $pass | sudo -S echo "Restart=on-abort" >> temp2.txt
-    #echo $pass | sudo -S echo "RemainAfterExit=yes" >> temp2.txt
-    #echo $pass | sudo -S echo "[Install]" >> temp2.txt
-    #echo $pass | sudo -S echo "WantedBy=multi-user.target" >> temp2.txt
-    #echo $pass | sudo -S mv temp2.txt /etc/systemd/system/glances.service
-    #echo $pass | sudo -S systemctl enable glances.service
+    echo $pass | sudo -S sudo systemctl kill apache2
+    echo $pass | sudo -S sudo systemctl enable nginx
+    echo $pass | sudo -S sudo systemctl enable apache2
+
     echo $pass | sudo -S rm -rf phpMyAdmin-* phpmyadmin.keyring temp*.txt
+
+    echo "
+        In /etc/apache2/ports.conf, change the port as
+
+        Listen 8080
+
+        Then go to /etc/apache2/sites-enabled/000-default.conf
+
+        And change the first line as
+
+        <VirtualHost *: 8080>
+
+        Now restart
+
+        sudo systemctl start apache2
+
+        Apache will now listen on port 8080 and redirect to /var/www/html"
+
+    echo "
+    Now use the example default file to use php in your nginx server and make sure to create the directory needed
+
+    sudo mkdir /home/$username/all-webs 
+
+    and after that restart apache and nginx
+
+    sudo systemctl restart apache2 nginx
+    "
+
     quit
 }
 
 echo $pass | sudo -S apt update
-echo $pass | sudo -S apt install -y wget curl apache2 mariadb-server mariadb-client php7.4 libapache2-mod-php7.4 php7.4-mysql php-pear vsftpd build-essential python3 python3-dev python3-jinja2 python3-psutil python3-setuptools psensor psensor-server python3-pip lm-sensors
+echo $pass | sudo -S apt install -y wget curl apache2 mariadb-server mariadb-client php7.4 libapache2-mod-php7.4 php7.4-mysql php7.4-fpm php-pear vsftpd build-essential python3 python3-dev python3-jinja2 python3-psutil python3-setuptools psensor psensor-server python3-pip lm-sensors nodejs npm nginx
 
 pip3 install --upgrade pip --user
-pip3 install --user bottle
-wget -O- https://bit.ly/glances | /bin/bash
 
 echo $pass | sudo -S apt clean
 
@@ -124,7 +141,7 @@ echo "CREATE DATABASE yourDB;"
 echo ""
 echo "Next run "
 echo ""
-echo "CREATE USER 'dev'@localhost IDENTIFIED BY 'dev';"
+echo "CREATE USER '$username'@localhost IDENTIFIED BY '$username';"
 echo ""
 echo "Next run "
 echo ""
@@ -132,7 +149,7 @@ echo "SELECT User FROM mysql.user;"
 echo ""
 echo "Next run "
 echo ""
-echo "GRANT ALL PRIVILEGES ON *.* TO 'dev'@localhost IDENTIFIED BY 'dev';"
+echo "GRANT ALL PRIVILEGES ON *.* TO '$username'@localhost IDENTIFIED BY '$username';"
 echo ""
 echo "Waiting for user to press any key or Q to quit..."
 read -rsn1 input
