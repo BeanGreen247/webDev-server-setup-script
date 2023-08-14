@@ -36,8 +36,11 @@ server {
     server_name localhost;
     root /home/dev/all-webs;
 
-    location / {
-        try_files $uri $uri/ index.php;
+    location ~^/ {
+        alias /home/dev/all-webs;
+        include snippets/fastcgi-php.conf;
+        index index.php;
+        fastcgi_pass unix:/run/php/php7.4-fpm.sock;
     }
 
     location ~^/test-nginx {
