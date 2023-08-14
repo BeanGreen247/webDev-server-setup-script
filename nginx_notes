@@ -1,0 +1,66 @@
+# setting up firewall
+
+sudo apt install iptables ufw -y
+sudo ufw enable
+sudo systemctl enable iptables
+sudo systemctl start iptables
+sudo iptables -A INPUT -m state --state NEW -p tcp --dport 80 -j ACCEPT
+sudo iptables -A INPUT -m state --state NEW -p tcp --dport 443 -j ACCEPT
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo mkdir /etc/iptables
+sudo touch /etc/iptables/rules.v4
+sudo sh -c "iptables-save > /etc/iptables/rules.v4"
+sudo systemctl restart iptables.service
+sudo ufw reload
+
+# /etc/nginx/nginx.conf
+user www-data;
+worker_processes auto;
+pid /run/nginx.pid;
+include /etc/nginx/modules-enabled/*.conf;
+...
+
+http {
+        # filter allowed IPs
+        allow 10.10.0.0/24;
+        deny all; 
+	...some other stuff after it
+}
+
+# /etc/nginx/sites-enabled/default
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    index index.php index.html index.htm index.nginx-debian.html;
+    server_name localhost;
+    root /home/dev/all-webs;
+
+    location / {
+        try_files $uri $uri/ index.php;
+    }
+
+    location ~^/test-nginx {
+        alias /home/dev/all-webs;
+        include snippets/fastcgi-php.conf;
+        index index.php;
+        fastcgi_pass unix:/run/php/php7.4-fpm.sock;
+    }
+
+    location ~^/test-page-1 {
+        alias /home/dev/all-webs;
+        include snippets/fastcgi-php.conf;
+        index index.php;
+        fastcgi_pass unix:/run/php/php7.4-fpm.sock;
+    }
+}
+
+# will be important
+
+sudo service nginx reload
+sudo service php7.4-fpm restart
+
+sudo chown -R dev /home/dev/all-webs
+sudo chgrp -R www-data /home/dev/all-webs
+sudo chmod -R 750 /home/dev/all-webs
+sudo chmod g+s /home/dev/all-webs

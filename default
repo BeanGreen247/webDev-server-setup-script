@@ -1,23 +1,26 @@
+# sudo service nginx reload # to apply config
 server {
-	listen 80 default_server;
-	listen [::]:80 default_server;
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    index index.php index.html index.htm index.nginx-debian.html;
+    server_name localhost;
+    root /home/dev/all-webs;
 
-	root /home/dev/all-webs;
-	index index.php index.html index.htm index.nginx-debian.html;
+    location / {
+	try_files $uri $uri/ index.php;
+    }
 
-	server_name _;
-
-	location /test-nginx {
+    location ~^/test-nginx {
+        alias /home/dev/all-webs;
         include snippets/fastcgi-php.conf;
-		index index.php
-        try_files $uri $uri/ /test-nginx/index.php;
-    	fastcgi_pass unix:/run/php/php7.4-fpm.sock;
-  	}
+        index index.php;
+        fastcgi_pass unix:/run/php/php7.4-fpm.sock;
+    }
 
-	location /test-page-1 {
+    location ~^/test-page-1 {
+        alias /home/dev/all-webs;
         include snippets/fastcgi-php.conf;
-		index index.php
-        try_files $uri $uri/ /test-page-1/index.php;
-    	fastcgi_pass unix:/run/php/php7.4-fpm.sock;
-  	}
+        index index.php;
+        fastcgi_pass unix:/run/php/php7.4-fpm.sock;
+    }
 }
