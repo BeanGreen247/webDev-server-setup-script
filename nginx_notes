@@ -36,6 +36,16 @@ server {
     server_name localhost;
     root /home/dev/all-webs;
 
+    location ~^/style\.css$ {
+        alias /home/dev/all-webs/style.css;
+        add_header Cache-Control "public, max-age=604800, immutable";
+    }
+
+    location ~^/([^/]+)/style\.css$ {
+        alias /home/dev/all-webs/$1/style.css;
+        add_header Cache-Control "public, max-age=604800, immutable";
+    }
+
     location ~^/ {
         alias /home/dev/all-webs;
         include snippets/fastcgi-php.conf;
