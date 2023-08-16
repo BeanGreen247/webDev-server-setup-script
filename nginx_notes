@@ -33,34 +33,20 @@ server {
     listen 80 default_server;
     listen [::]:80 default_server;
     index index.php index.html index.htm index.nginx-debian.html;
-    server_name localhost;
+    server_name bg247-dev-lintic;
     root /home/dev/all-webs;
 
     location ~^/style\.css$ {
         alias /home/dev/all-webs/style.css;
-        add_header Cache-Control "public, max-age=604800, immutable";
+        add_header Cache-Control "public, max-age=0, immutable";
     }
 
     location ~^/([^/]+)/style\.css$ {
         alias /home/dev/all-webs/$1/style.css;
-        add_header Cache-Control "public, max-age=604800, immutable";
+        add_header Cache-Control "public, max-age=0, immutable";
     }
 
     location ~^/ {
-        alias /home/dev/all-webs;
-        include snippets/fastcgi-php.conf;
-        index index.php;
-        fastcgi_pass unix:/run/php/php7.4-fpm.sock;
-    }
-
-    location ~^/test-nginx {
-        alias /home/dev/all-webs;
-        include snippets/fastcgi-php.conf;
-        index index.php;
-        fastcgi_pass unix:/run/php/php7.4-fpm.sock;
-    }
-
-    location ~^/test-page-1 {
         alias /home/dev/all-webs;
         include snippets/fastcgi-php.conf;
         index index.php;
