@@ -76,7 +76,9 @@ function main {
     echo $pass | sudo -S systemctl enable ufw
     echo $pass | sudo -S ufw allow ftp
     echo $pass | sudo -S ufw allow 21
+    echo $pass | sudo -S ufw allow 22
     echo $pass | sudo -S ufw allow 61208
+    echo $pass | sudo -S ufw allow 5900
     echo $pass | sudo -S ufw reload
 
     echo $pass | sudo -S sudo systemctl kill apache2
