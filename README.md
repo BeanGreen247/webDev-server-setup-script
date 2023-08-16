@@ -11,4 +11,4 @@ use raspi-config and go here, there you will find the follwing option and enable
 
 ### what happens when running headless now?
 
-well it defaults to a pretty low resolution of 1024x768 so use the resolutions.sh script at startup or use arandr software
+well it defaults to a pretty resolution of 1024x768 so use the resolutions.sh script at startup or use arandr software
