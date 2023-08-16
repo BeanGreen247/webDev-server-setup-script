@@ -6,4 +6,5 @@ make sure to read the [nginx_notes](https://github.com/BeanGreen247/webDev-serve
 what about ssh and vnc remote desktop?
 
 use raspi-config and go here, there you will find the follwing option and enable SSH and VNC
+
 3 Interface Options    Configure connections to peripherals
