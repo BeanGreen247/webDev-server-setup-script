@@ -15,7 +15,7 @@ well it defaults to a pretty resolution of 1024x768 so use the resolutions.sh sc
 
 ### what if i do not want to manage the db using commandline tools?
 
-i personally use [DBeaver](https://github.com/dbeaver/dbeaver)
+i personally use [HeidiSQL](https://github.com/HeidiSQL/HeidiSQL)
 
 ### make sure to do this
 
