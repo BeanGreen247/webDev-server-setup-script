@@ -151,6 +151,11 @@ echo "Next run "
 echo ""
 echo "GRANT ALL PRIVILEGES ON *.* TO '$username'@localhost IDENTIFIED BY '$username';"
 echo ""
+echo "Finally run"
+echo ""
+echo "FLUSH PRIVILEGES;"
+echo ""
+echo "Then quit out of mysql..."
 echo "Waiting for user to press any key or Q to quit..."
 read -rsn1 input
 if [ "$input" = "q" ]; then
