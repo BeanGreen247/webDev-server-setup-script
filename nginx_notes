@@ -23,8 +23,8 @@ include /etc/nginx/modules-enabled/*.conf;
 
 http {
         # filter allowed IPs
-        allow 10.10.0.0/24;
-        deny all; 
+        #allow 10.10.0.0/24;
+        allow all; 
 	...some other stuff after it
 }
 
