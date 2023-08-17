@@ -13,6 +13,8 @@ use raspi-config and go here, there you will find the follwing option and enable
 
 well it defaults to a pretty resolution of 1024x768 so use the resolutions.sh script at startup or use arandr software
 
+unless you remove xrog like i just did, so no screen for you, only ssh
+
 ### what if i do not want to manage the db using commandline tools?
 
 i personally use [HeidiSQL](https://github.com/HeidiSQL/HeidiSQL)
