@@ -1,7 +1,5 @@
 # links
-#http://192.168.0.110/ apache2_default_index_html
-#http://192.168.0.110/info.php php_information
-#http://192.168.0.110/phpMyAdmin phpMyAdmin
+# http://10.10.0.124:8080/phpMyAdmin/phpMyAdmin
 
 pass="dev"
 username="dev"
