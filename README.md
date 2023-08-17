@@ -22,3 +22,17 @@ i personally use [DBeaver](https://github.com/dbeaver/dbeaver)
 sudo nano /etc/mysql/mariadb.cnf
 
 and uncomment the port 3306
+
+next run these commands
+
+sudo ufw allow 3306/tcp
+sudo ufw reload
+
+and make sure the file is changed to this
+
+/etc/mysql/mariadb.conf.d/50-server.cnf
+
+bind-address = 127.0.0.1
+port = 3306
+
+then reload the db software or reboot
